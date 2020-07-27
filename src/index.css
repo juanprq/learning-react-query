@@ -31,3 +31,20 @@ button:hover{
 .content{
   text-align: left;
 }
+
+.card {
+  padding: 8px 16px;
+  margin: 16px 0;
+  background-color: #1b1b1b;
+  border-radius: 20px;
+}
+
+.card p {
+  margin: 6px 0;
+  color: #999;
+}
+
+.card h3 {
+  margin: 10px 0;
+  color: #ffff57;
+}
