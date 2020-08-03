@@ -1,11 +1,10 @@
 import React, { useState } from 'react';
-import { useQuery } from 'react-query';
+import { usePaginatedQuery } from 'react-query';
 
 import Planet from './Planet';
 
-const fetchPlanets = async (key, greetings, page) => {
+const fetchPlanets = async (key, page) => {
   // we can receive the parameters of the query
-  console.log(greetings, page);
   console.log(page);
 
   const response = await fetch(`http://swapi.dev/api/planets?page=${page}`);
@@ -14,11 +13,8 @@ const fetchPlanets = async (key, greetings, page) => {
 
 const Planets = () => {
   const [page, setPage] = useState(1);
-  const { data, status } = useQuery([
-      'planets',
-      'hello ninjas',
-      page,
-    ],
+  const { resolvedData, latestData, status } = usePaginatedQuery(
+    ['planets', page],
     fetchPlanets,
     {
       staleTime: 0,
@@ -32,9 +28,6 @@ const Planets = () => {
     <div>
       <h2>Planets</h2>
 
-      <button onClick={() => setPage(1)}>Page 1</button>
-      <button onClick={() => setPage(2)}>Page 2</button>
-      <button onClick={() => setPage(3)}>Page 3</button>
       {
         status === 'error' && (
           <div>Error fetching data</div>
@@ -47,13 +40,18 @@ const Planets = () => {
       }
       {
         status === 'success' && (
-          <div>
-            {
-              data.results.map(planet => (
-                <Planet key={planet.name} planet={planet} />
-              ))
-            }
-          </div>
+          <>
+            <button disabled={page === 1} onClick={() => setPage((currentPage) => Math.max(currentPage - 1, 1))}>Previous page</button>
+            <span>{page}</span>
+            <button disabled={!latestData || !latestData.next} onClick={() => setPage((currentPage) => (!latestData || !latestData.next ? currentPage : currentPage + 1))}>Next page</button>
+            <div>
+              {
+                resolvedData.results.map(planet => (
+                  <Planet key={planet.name} planet={planet} />
+                ))
+              }
+            </div>
+          </>
         )
       }
     </div>
